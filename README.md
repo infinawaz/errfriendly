@@ -4,7 +4,7 @@
 
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![PyPI version](https://badge.fury.io/py/errfriendly.svg)](https://badge.fury.io/py/errfriendly)
+[![PyPI version](https://img.shields.io/pypi/v/errfriendly.svg)](https://pypi.org/project/errfriendly/)
 
 **errfriendly** transforms cryptic Python error messages into clear, actionable explanations. Perfect for beginners learning Python or experienced developers who want faster debugging.
 
@@ -30,7 +30,7 @@ pip install errfriendly
 For development installation:
 
 ```bash
-git clone https://github.com/yourusername/errfriendly.git
+git clone https://github.com/infinawaz/errfriendly.git
 cd errfriendly
 pip install -e ".[dev]"
 ```
@@ -245,7 +245,7 @@ Contributions are welcome! Here's how you can help:
 ### Development Setup
 
 ```bash
-git clone https://github.com/yourusername/errfriendly.git
+git clone https://github.com/infinawaz/errfriendly.git
 cd errfriendly
 pip install -e ".[dev]"
 pytest
