@@ -7,7 +7,28 @@ that analyzes the error message and provides contextual advice.
 """
 
 import re
+import sys
 from typing import Type, Optional
+
+
+# ANSI color codes for terminal output
+class _Colors:
+    """ANSI color codes for terminal output."""
+    RESET = "\033[0m"
+    BOLD = "\033[1m"
+    RED = "\033[91m"
+    GREEN = "\033[92m"
+    YELLOW = "\033[93m"
+    BLUE = "\033[94m"
+    CYAN = "\033[96m"
+
+
+def _use_colors() -> bool:
+    """Check if we should use ANSI colors (only if stderr is a TTY)."""
+    try:
+        return sys.stderr.isatty()
+    except Exception:
+        return False
 
 
 def get_friendly_message(exc_type: Type[BaseException], exc_value: BaseException) -> str:
@@ -45,6 +66,11 @@ def get_friendly_message(exc_type: Type[BaseException], exc_value: BaseException
         "MemoryError": _explain_memory_error,
         "UnicodeDecodeError": _explain_unicode_decode_error,
         "UnicodeEncodeError": _explain_unicode_encode_error,
+        "AssertionError": _explain_assertion_error,
+        "NotImplementedError": _explain_not_implemented_error,
+        "KeyboardInterrupt": _explain_keyboard_interrupt,
+        "TimeoutError": _explain_timeout_error,
+        "ConnectionError": _explain_connection_error,
     }
     
     handler = handlers.get(exc_name, _explain_generic_error)
@@ -63,24 +89,37 @@ def _format_message(title: str, explanation: str, suggestions: list[str]) -> str
     Returns:
         A formatted string with the error explanation.
     """
+    use_colors = _use_colors()
+    c = _Colors
+    
+    # Helper to apply color if TTY
+    def colorize(text: str, color: str) -> str:
+        return f"{color}{text}{c.RESET}" if use_colors else text
+    
+    separator = colorize("=" * 70, c.CYAN)
+    header = colorize("🔍 FRIENDLY ERROR EXPLANATION", c.BOLD + c.CYAN)
+    title_text = colorize(f"📛 {title}", c.BOLD + c.RED)
+    what_happened = colorize("💡 What happened:", c.BOLD + c.YELLOW)
+    how_to_fix = colorize("🔧 How to fix it:", c.BOLD + c.GREEN)
+    
     lines = [
         "",
-        "=" * 70,
-        "🔍 FRIENDLY ERROR EXPLANATION",
-        "=" * 70,
+        separator,
+        header,
+        separator,
         "",
-        f"📛 {title}",
+        title_text,
         "",
-        f"💡 What happened:",
+        what_happened,
         f"   {explanation}",
         "",
-        "🔧 How to fix it:",
+        how_to_fix,
     ]
     
     for i, suggestion in enumerate(suggestions, 1):
         lines.append(f"   {i}. {suggestion}")
     
-    lines.extend(["", "=" * 70, ""])
+    lines.extend(["", separator, ""])
     
     return "\n".join(lines)
 
@@ -692,6 +731,91 @@ def _explain_unicode_encode_error(exc_type: Type[BaseException], exc_value: Base
     )
 
 
+def _explain_assertion_error(exc_type: Type[BaseException], exc_value: BaseException, error_message: str) -> str:
+    """Handle AssertionError exceptions."""
+    
+    return _format_message(
+        "AssertionError: Assertion failed",
+        f"An assert statement failed: {error_message or 'No message provided'}. "
+        "This means a condition you expected to be True was actually False.",
+        [
+            "Check the values being compared in the assert statement.",
+            "Print the variables before the assert to see their actual values.",
+            "Consider whether the assertion condition is correct.",
+            "For tests, check if your expected values match what the code produces.",
+            "Remove or fix the assert if it's no longer valid."
+        ]
+    )
+
+
+def _explain_not_implemented_error(exc_type: Type[BaseException], exc_value: BaseException, error_message: str) -> str:
+    """Handle NotImplementedError exceptions."""
+    
+    return _format_message(
+        "NotImplementedError: Feature not implemented",
+        "You called a method or function that hasn't been implemented yet. "
+        "This is often used as a placeholder in abstract base classes or during development.",
+        [
+            "Implement the method in a subclass if using abstract classes.",
+            "Check if there's an alternative method you should be using.",
+            "If this is your code, implement the missing functionality.",
+            "Check the documentation to see if this feature is planned.",
+            "Consider if you're using the right class or library version."
+        ]
+    )
+
+
+def _explain_keyboard_interrupt(exc_type: Type[BaseException], exc_value: BaseException, error_message: str) -> str:
+    """Handle KeyboardInterrupt exceptions."""
+    
+    return _format_message(
+        "KeyboardInterrupt: Program interrupted",
+        "The program was interrupted by the user (usually by pressing Ctrl+C). "
+        "This is normal when you want to stop a long-running program.",
+        [
+            "This is typically intentional - your program was stopped on purpose.",
+            "To handle interrupts gracefully, use try/except KeyboardInterrupt.",
+            "Consider saving progress before allowing interruption.",
+            "For servers/daemons, implement proper shutdown handlers.",
+            "Use signal handlers for more control over program termination."
+        ]
+    )
+
+
+def _explain_timeout_error(exc_type: Type[BaseException], exc_value: BaseException, error_message: str) -> str:
+    """Handle TimeoutError exceptions."""
+    
+    return _format_message(
+        "TimeoutError: Operation timed out",
+        "An operation took too long to complete and was aborted. "
+        "This usually happens with network requests, file operations, or synchronization.",
+        [
+            "Check your network connection if this involves remote resources.",
+            "Increase the timeout value if the operation legitimately needs more time.",
+            "Verify the remote server/service is responsive.",
+            "Consider using async/await for non-blocking operations.",
+            "Implement retry logic with exponential backoff."
+        ]
+    )
+
+
+def _explain_connection_error(exc_type: Type[BaseException], exc_value: BaseException, error_message: str) -> str:
+    """Handle ConnectionError exceptions."""
+    
+    return _format_message(
+        "ConnectionError: Connection failed",
+        f"A connection could not be established: {error_message}. "
+        "This usually happens when trying to connect to a remote server or database.",
+        [
+            "Check your internet connection.",
+            "Verify the server address and port are correct.",
+            "Ensure the remote service is running and accessible.",
+            "Check if a firewall is blocking the connection.",
+            "Implement retry logic to handle temporary network issues."
+        ]
+    )
+
+
 def _explain_generic_error(exc_type: Type[BaseException], exc_value: BaseException, error_message: str) -> str:
     """Handle any exception type not specifically covered."""
     
@@ -709,3 +833,4 @@ def _explain_generic_error(exc_type: Type[BaseException], exc_value: BaseExcepti
             "Use a debugger or add try/except blocks to isolate the issue."
         ]
     )
+

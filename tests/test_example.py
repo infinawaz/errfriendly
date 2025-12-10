@@ -341,3 +341,112 @@ class TestMessageModule:
         for exc_type, exc_value in exceptions:
             message = get_friendly_message(exc_type, exc_value)
             assert "How to fix it" in message
+    
+    def test_new_exception_handlers(self):
+        """Test the new exception handlers added in v0.2.0."""
+        from errfriendly.messages import get_friendly_message
+        
+        exceptions = [
+            (AssertionError, AssertionError("expected 1 but got 2")),
+            (NotImplementedError, NotImplementedError("this feature is not available")),
+            (TimeoutError, TimeoutError("connection timed out")),
+            (ConnectionError, ConnectionError("refused")),
+        ]
+        
+        for exc_type, exc_value in exceptions:
+            message = get_friendly_message(exc_type, exc_value)
+            assert isinstance(message, str)
+            assert len(message) > 0
+            assert "FRIENDLY ERROR EXPLANATION" in message
+            assert "How to fix it" in message
+
+
+class TestLogging:
+    """Test the logging functionality."""
+    
+    def test_logging_to_file(self):
+        """Test that exceptions are logged to a file when configured."""
+        script = textwrap.dedent("""
+            import errfriendly
+            import tempfile
+            import os
+            
+            # Create a temporary log file
+            log_path = os.path.join(tempfile.gettempdir(), 'errfriendly_test.log')
+            
+            errfriendly.install(log_file=log_path)
+            
+            # Trigger an exception
+            1 / 0
+        """)
+        
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as f:
+            f.write(script)
+            f.flush()
+            temp_path = f.name
+        
+        log_path = os.path.join(tempfile.gettempdir(), 'errfriendly_test.log')
+        
+        try:
+            result = subprocess.run(
+                [sys.executable, temp_path],
+                capture_output=True,
+                text=True,
+                timeout=30
+            )
+            
+            # Check log file was created and contains exception info
+            assert os.path.exists(log_path), "Log file should be created"
+            with open(log_path, 'r', encoding='utf-8') as f:
+                log_content = f.read()
+            assert "ZeroDivisionError" in log_content
+            assert "FRIENDLY ERROR EXPLANATION" in log_content
+        finally:
+            os.unlink(temp_path)
+            if os.path.exists(log_path):
+                os.unlink(log_path)
+
+
+class TestRobustness:
+    """Test the robustness of the exception handler."""
+    
+    def test_graceful_failure(self):
+        """Test that errfriendly fails gracefully if message generation fails."""
+        # This tests that if get_friendly_message raises an exception,
+        # the original traceback is still shown
+        script = textwrap.dedent("""
+            import errfriendly
+            from errfriendly import handler
+            
+            # Monkey-patch at the handler module level where it's actually used
+            def broken_get(*args, **kwargs):
+                raise RuntimeError("Simulated internal failure")
+            handler.get_friendly_message = broken_get
+            
+            errfriendly.install()
+            
+            # Trigger an exception
+            1 / 0
+        """)
+        
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as f:
+            f.write(script)
+            f.flush()
+            temp_path = f.name
+        
+        try:
+            result = subprocess.run(
+                [sys.executable, temp_path],
+                capture_output=True,
+                text=True,
+                timeout=30
+            )
+            
+            # Should contain the warning about errfriendly failing
+            assert "[errfriendly] Failed to generate friendly message" in result.stderr
+            # Should still contain the original traceback
+            assert "ZeroDivisionError" in result.stderr
+        finally:
+            os.unlink(temp_path)
+
+
