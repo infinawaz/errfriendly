@@ -14,10 +14,12 @@
 
 - 🔍 **Clear Explanations**: Understand what went wrong in plain English
 - 💡 **Actionable Suggestions**: Get step-by-step guidance on how to fix common errors
+- 🎨 **Colorful Output**: ANSI colors in terminal for better readability
+- 📝 **Logging Support**: Optionally log exceptions to a file
 - 🎯 **Zero Dependencies**: Pure Python, no external packages required
 - ⚡ **Easy Integration**: Just two lines of code to get started
 - 🔧 **Configurable**: Show or hide the original traceback as needed
-- 📦 **18+ Exception Types**: Covers all common Python exceptions
+- 📦 **23 Exception Types**: Covers all common Python exceptions
 
 ---
 
@@ -129,6 +131,15 @@ if is_installed():
     print("errfriendly is active!")
 ```
 
+### Enable Logging to File
+
+```python
+import errfriendly
+
+# Log exceptions to a file for later review
+errfriendly.install(log_file="errors.log")
+```
+
 ---
 
 ## 📋 Supported Exception Types
@@ -155,6 +166,11 @@ errfriendly provides friendly explanations for:
 | `OverflowError` | Number too large |
 | `MemoryError` | Out of memory |
 | `StopIteration` | Iterator exhausted |
+| `AssertionError` | Failed assertions |
+| `NotImplementedError` | Unimplemented features |
+| `KeyboardInterrupt` | User interruption (Ctrl+C) |
+| `TimeoutError` | Operation timeouts |
+| `ConnectionError` | Network connection failures |
 
 Plus a **fallback handler** for any other exception types!
 
@@ -215,15 +231,16 @@ pytest --cov=errfriendly --cov-report=html
 
 ## 🗺️ Roadmap
 
-### v0.2.0 (Planned)
-- [ ] Colored output for terminal
+### v0.2.0 ✅ (Current)
+- [x] Colored output for terminal (ANSI colors)
+- [x] Logging exceptions to file
+- [x] Additional exception handlers (5 new types)
+- [x] Graceful failure handling
+
+### v0.3.0 (Planned)
 - [ ] Suggestion ranking by likelihood
 - [ ] Integration with popular IDEs
-
-### v0.3.0 (Future)
-- [ ] Machine learning-based error classification
 - [ ] Custom error message templates
-- [ ] Internationalization (i18n) support
 - [ ] Stack trace analysis for better context
 
 ### v1.0.0 (Goal)
@@ -231,6 +248,7 @@ pytest --cov=errfriendly --cov-report=html
 - [ ] Comprehensive documentation
 - [ ] Plugin system for custom handlers
 - [ ] Integration with error tracking services (Sentry, etc.)
+- [ ] Internationalization (i18n) support
 
 ---
 
