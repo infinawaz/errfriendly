@@ -4,13 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "errfriendly"
-version = "3.3.0"
+version = "3.3.1"
 description = "Friendly explanations for Python errors"
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.8"
 authors = [
-    {name = "Shahnawaz", email = "your.email@example.com"}
+    {name = "Shahnawaz", email = "shahnawazdgp07@gmail.com"}
 ]
 keywords = ["exceptions", "debugging", "developer-tools", "error-messages", "traceback", "ai", "llm", "ollama", "openai"]
 classifiers = [

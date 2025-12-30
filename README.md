@@ -15,6 +15,11 @@
 pip install errfriendly
 ```
 
+### Uninstall
+```bash
+pip uninstall errfriendly
+```
+
 ### Use
 ```python
 import errfriendly
