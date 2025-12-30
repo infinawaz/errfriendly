@@ -57,33 +57,35 @@ TypeError: 'NoneType' object is not subscriptable
 
 ## 🤖 Want AI-Powered Explanations? (Optional)
 
-Get even smarter, context-aware explanations using ChatGPT:
+Get even smarter, context-aware explanations using **DeepSeek** (open-source, cheap!):
 
 ### Step 1: Install with AI support
 ```bash
-pip install errfriendly[ai-openai]
+pip install errfriendly[ai-deepseek]
 ```
 
-### Step 2: Set your API key
+### Step 2: Get your API key
+1. Go to https://platform.deepseek.com/
+2. Sign up and get your API key (free credits included!)
+
+### Step 3: Set your API key
 ```bash
 # Windows (PowerShell)
-$env:OPENAI_API_KEY = "sk-your-key-here"
+$env:DEEPSEEK_API_KEY = "sk-your-key-here"
 
 # Mac/Linux
-export OPENAI_API_KEY="sk-your-key-here"
+export DEEPSEEK_API_KEY="sk-your-key-here"
 ```
 
-### Step 3: Enable AI
+### Step 4: Enable AI
 ```python
 import errfriendly
 
 errfriendly.install()
-errfriendly.enable_ai(backend="openai")
-
-# Now errors include personalized AI explanations!
+errfriendly.enable_ai()  # Uses DeepSeek by default!
 ```
 
-> **💡 Tip:** Don't have an OpenAI key? The basic `errfriendly.install()` works great without AI!
+> **💡 Tip:** Don't have a DeepSeek key? The basic `errfriendly.install()` works great without AI!
 
 ---
 
@@ -163,6 +165,7 @@ Focus on the underlying TypeError first. The ValueError is just a wrapper.
 
 | Backend | Command | Best For |
 |---------|---------|----------|
+| **DeepSeek** ⭐ | `pip install errfriendly[ai-deepseek]` | Open-source, cheap, great quality (default) |
 | **OpenAI** | `pip install errfriendly[ai-openai]` | Best quality |
 | **Anthropic** | `pip install errfriendly[ai-anthropic]` | Claude fans |
 | **Gemini** | `pip install errfriendly[ai-gemini]` | Free tier available |
@@ -170,10 +173,12 @@ Focus on the underlying TypeError first. The ValueError is just a wrapper.
 
 ```python
 # Choose your backend
-errfriendly.enable_ai(backend="openai")      # ChatGPT
-errfriendly.enable_ai(backend="anthropic")   # Claude
-errfriendly.enable_ai(backend="gemini")      # Google Gemini
-errfriendly.enable_ai(backend="local")       # Ollama (local)
+errfriendly.enable_ai()                        # DeepSeek (default)
+errfriendly.enable_ai(backend="deepseek")      # DeepSeek (explicit)
+errfriendly.enable_ai(backend="openai")        # ChatGPT
+errfriendly.enable_ai(backend="anthropic")     # Claude
+errfriendly.enable_ai(backend="gemini")        # Google Gemini
+errfriendly.enable_ai(backend="local")         # Ollama (local)
 ```
 
 ---

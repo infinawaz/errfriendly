@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "errfriendly"
-version = "3.0.1"
+version = "3.1.0"
 description = "Friendly explanations for Python errors"
 readme = "README.md"
 license = {text = "MIT"}
@@ -44,6 +44,9 @@ dev = [
 # AI feature optional dependencies
 ai-local = [
     "httpx>=0.24.0",
+]
+ai-deepseek = [
+    "openai>=1.0.0",  # DeepSeek uses OpenAI-compatible API
 ]
 ai-openai = [
     "openai>=1.0.0",

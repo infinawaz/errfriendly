@@ -389,12 +389,13 @@ def enable_ai(
         backend_map = {
             "local": AIBackend.LOCAL,
             "ollama": AIBackend.LOCAL,
+            "deepseek": AIBackend.DEEPSEEK,
             "openai": AIBackend.OPENAI,
             "anthropic": AIBackend.ANTHROPIC,
             "gemini": AIBackend.GEMINI,
             "google": AIBackend.GEMINI,
         }
-        _config.ai_backend = backend_map.get(backend.lower(), AIBackend.LOCAL)
+        _config.ai_backend = backend_map.get(backend.lower(), AIBackend.DEEPSEEK)
     else:
         _config.ai_backend = backend
     
@@ -415,16 +416,18 @@ def enable_ai(
     else:
         default_models = {
             AIBackend.LOCAL: "codellama",
+            AIBackend.DEEPSEEK: "deepseek-chat",
             AIBackend.OPENAI: "gpt-4o-mini",
             AIBackend.ANTHROPIC: "claude-3-haiku-20240307",
             AIBackend.GEMINI: "gemini-1.5-flash",
         }
-        _config.ai_model = default_models.get(_config.ai_backend, "codellama")
+        _config.ai_model = default_models.get(_config.ai_backend, "deepseek-chat")
     
     # Set API key if provided (for cloud backends)
     if api_key and _config.ai_backend != AIBackend.LOCAL:
         import os
         env_vars = {
+            AIBackend.DEEPSEEK: "DEEPSEEK_API_KEY",
             AIBackend.OPENAI: "OPENAI_API_KEY",
             AIBackend.ANTHROPIC: "ANTHROPIC_API_KEY",
             AIBackend.GEMINI: "GOOGLE_API_KEY",

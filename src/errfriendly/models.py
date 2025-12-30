@@ -20,6 +20,7 @@ class ExplainDepth(Enum):
 class AIBackend(Enum):
     """Supported AI backend types."""
     LOCAL = "local"              # Ollama, llama.cpp, GPT4All
+    DEEPSEEK = "deepseek"        # DeepSeek API (OpenAI-compatible, open-source)
     OPENAI = "openai"
     ANTHROPIC = "anthropic"
     GEMINI = "gemini"

@@ -233,6 +233,69 @@ class OpenAIBackend(AIBackendBase):
         return response.choices[0].message.content or ""
 
 
+class DeepSeekBackend(AIBackendBase):
+    """DeepSeek API backend (OpenAI-compatible, open-source models).
+    
+    DeepSeek offers powerful open-source models at low cost.
+    API docs: https://platform.deepseek.com/
+    """
+    
+    def __init__(
+        self, 
+        api_key: Optional[str] = None, 
+        model: str = "deepseek-chat",
+        timeout: float = 30.0
+    ):
+        """Initialize DeepSeek backend.
+        
+        Args:
+            api_key: DeepSeek API key. Uses DEEPSEEK_API_KEY env var if not provided.
+            model: Model name ('deepseek-chat' or 'deepseek-coder').
+            timeout: Request timeout in seconds.
+        """
+        import os
+        self.api_key = api_key or os.getenv("DEEPSEEK_API_KEY", "")
+        self.model = model
+        self.timeout = timeout
+        self.base_url = "https://api.deepseek.com"
+    
+    @property
+    def name(self) -> str:
+        return f"DeepSeek ({self.model})"
+    
+    def is_available(self) -> bool:
+        """Check if API key is configured."""
+        return bool(self.api_key)
+    
+    def generate(self, prompt: str, system_prompt: str) -> str:
+        """Generate response using DeepSeek API (OpenAI-compatible)."""
+        try:
+            import openai
+        except ImportError:
+            raise ImportError(
+                "openai is required for DeepSeek backend (uses OpenAI-compatible API). "
+                "Install it with: pip install errfriendly[ai-deepseek]"
+            )
+        
+        client = openai.OpenAI(
+            api_key=self.api_key, 
+            base_url=self.base_url,
+            timeout=self.timeout
+        )
+        
+        response = client.chat.completions.create(
+            model=self.model,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": prompt},
+            ],
+            temperature=0.7,
+            max_tokens=1500,
+        )
+        
+        return response.choices[0].message.content or ""
+
+
 class AnthropicBackend(AIBackendBase):
     """Anthropic Claude API backend."""
     
@@ -359,6 +422,10 @@ class AIExplainer:
         
         backend_map = {
             AIBackend.LOCAL: lambda: OllamaBackend(
+                model=self.config.ai_model,
+                timeout=self.config.ai_timeout,
+            ),
+            AIBackend.DEEPSEEK: lambda: DeepSeekBackend(
                 model=self.config.ai_model,
                 timeout=self.config.ai_timeout,
             ),
