@@ -17,6 +17,7 @@ from .handler import (
     get_config,
 )
 from .audit import enable_audit, disable_audit
+from .warning_handler import enable_warnings, disable_warnings
 from .messages import get_friendly_message
 from .models import (
     Config,
@@ -29,7 +30,7 @@ from .models import (
     AIExplanation,
 )
 
-__version__ = "3.3.1"
+__version__ = "3.4.0"
 __all__ = [
     # Core functions (backward compatible)
     "install",
@@ -45,6 +46,10 @@ __all__ = [
     # Audit (v3.1)
     "enable_audit",
     "disable_audit",
+
+    # Warnings (v3.4)
+    "enable_warnings",
+    "disable_warnings",
     
     # v3.0: Data types
     "Config",

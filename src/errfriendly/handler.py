@@ -14,6 +14,7 @@ import logging
 from typing import Type, Optional, Union, Dict, Any
 
 from .messages import get_friendly_message
+from .warning_handler import enable_warnings, disable_warnings
 from .models import (
     Config, 
     AIBackend, 
@@ -222,7 +223,8 @@ def _generate_ai_explanation(
 
 def install(
     show_original_traceback: bool = True,
-    log_file: Optional[str] = None
+    log_file: Optional[str] = None,
+    catch_warnings: bool = False,
 ) -> None:
     """
     Install the friendly exception hook.
@@ -245,6 +247,10 @@ def install(
         >>> 1 / 0  # Will show friendly ZeroDivisionError explanation
     """
     global _original_excepthook, _show_original_traceback, _logger
+    
+    # Enable friendly warnings if requested
+    if catch_warnings:
+        enable_warnings()
     
     # Store the original hook only if we haven't already
     if _original_excepthook is None:
@@ -287,6 +293,8 @@ def uninstall() -> None:
     """
     global _original_excepthook, _logger, _config
     global _context_collector, _ai_explainer, _chain_analyzer
+    
+    disable_warnings()
     
     # Restore the original hook if we have one saved
     if _original_excepthook is not None:

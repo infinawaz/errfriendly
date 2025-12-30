@@ -4,7 +4,9 @@ import json
 import errfriendly
 
 # Enable the new Proactive Audit feature
+# Enable the new Proactive Audit feature and Friendly Warnings
 errfriendly.enable_audit()
+errfriendly.enable_warnings()
 
 class EventCache:
     def __init__(self):

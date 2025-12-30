@@ -9,7 +9,7 @@ that analyzes the error message and provides contextual advice.
 import re
 import sys
 import difflib
-from typing import Type, Optional, List, Any, Dict, Tuple
+from typing import Type, Optional, List, Any, Dict, Tuple, Union
 from collections.abc import MutableMapping
 
 
@@ -90,7 +90,7 @@ def get_friendly_message(
     return handler(exc_type, exc_value, error_message)
 
 
-def _format_message(title: str, explanation: str, suggestions: List[str]) -> str:
+def _format_message(title: str, explanation: str, suggestions: List[str], theme: str = "error") -> str:
     """
     Format a friendly error message with consistent styling.
     
@@ -98,9 +98,7 @@ def _format_message(title: str, explanation: str, suggestions: List[str]) -> str
         title: A short title for the error.
         explanation: A plain-English explanation of what went wrong.
         suggestions: A list of suggestions for how to fix the error.
-    
-    Returns:
-        A formatted string with the error explanation.
+        theme: "error" (default) or "warning".
     """
     use_colors = _use_colors()
     c = _Colors
@@ -109,9 +107,20 @@ def _format_message(title: str, explanation: str, suggestions: List[str]) -> str
     def colorize(text: str, color: str) -> str:
         return f"{color}{text}{c.RESET}" if use_colors else text
     
-    separator = colorize("=" * 70, c.CYAN)
-    header = colorize("🔍 FRIENDLY ERROR EXPLANATION", c.BOLD + c.CYAN)
-    title_text = colorize(f"📛 {title}", c.BOLD + c.RED)
+    if theme == "warning":
+        separator_color = c.YELLOW
+        header_text = "⚠️ FRIENDLY WARNING"
+        header_color = c.BOLD + c.YELLOW
+        title_color = c.BOLD + c.YELLOW
+    else:  # error
+        separator_color = c.CYAN
+        header_text = "🔍 FRIENDLY ERROR EXPLANATION"
+        header_color = c.BOLD + c.CYAN
+        title_color = c.BOLD + c.RED
+
+    separator = colorize("=" * 70, separator_color)
+    header = colorize(header_text, header_color)
+    title_text = colorize(f"📛 {title}", title_color)
     what_happened = colorize("💡 What happened:", c.BOLD + c.YELLOW)
     how_to_fix = colorize("🔧 How to fix it:", c.BOLD + c.GREEN)
     
@@ -135,6 +144,61 @@ def _format_message(title: str, explanation: str, suggestions: List[str]) -> str
     lines.extend(["", separator, ""])
     
     return "\n".join(lines)
+
+
+def format_warning(title: str, explanation: str, suggestions: List[str]) -> str:
+    """Public API to format a warning message."""
+    return _format_message(title, explanation, suggestions, theme="warning")
+
+
+def get_friendly_warning(category: Type[Warning], message: Union[Warning, str]) -> str:
+    """
+    Get a friendly explanation for a warning.
+    """
+    cat_name = category.__name__
+    msg_str = str(message)
+    
+    if cat_name == "DeprecationWarning":
+        return _explain_deprecation_warning(category, message, msg_str)
+    elif cat_name == "SyntaxWarning":
+        return _explain_syntax_warning(category, message, msg_str)
+    
+    # Generic fallback
+    return _explain_generic_warning(category, message, msg_str)
+
+
+def _explain_deprecation_warning(category, message, msg_str) -> str:
+    suggestions = ["Check the documentation for the updated replacement."]
+    explanation = "This feature is outdated and will be removed in future Python versions."
+    
+    if "datetime.datetime.utcnow" in msg_str:
+        explanation = "The function `datetime.utcnow()` is deprecated because it returns a naive datetime (no timezone info), which causes bugs."
+        suggestions = [
+            "Use `datetime.now(datetime.UTC)` (Python 3.11+).",
+            "Use `datetime.now(timezone.utc)` (older Python).",
+            "Be careful: `utcnow()` returns local time if you're not careful with libraries."
+        ]
+        
+    return format_warning("DeprecationWarning", explanation, suggestions)
+
+
+def _explain_syntax_warning(category, message, msg_str) -> str:
+    suggestions = ["Fix the syntax to be standard Python."]
+    explanation = "The syntax is valid but suspicious."
+    
+    if "is" in msg_str and "literal" in msg_str:
+        explanation = "You used `is` to compare a literal (like `x is 5`). This works by accident on small integers but fails unpredictably."
+        suggestions = ["Use `==` for comparing values: `if x == 5:`"]
+        
+    return format_warning("SyntaxWarning", explanation, suggestions)
+
+
+def _explain_generic_warning(category, message, msg_str) -> str:
+    return format_warning(
+        category.__name__,
+        f"A warning occurred: {msg_str}",
+        ["Read the warning message carefully.", "This is not an error, but might become one later."]
+    )
 
 
 # =============================================================================
