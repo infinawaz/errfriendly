@@ -1,506 +1,236 @@
 # 🎯 errfriendly
 
-> **Friendly, human-readable explanations for Python exceptions — now with AI-powered contextual understanding!**
+> **Turn confusing Python errors into simple, helpful explanations!**
 
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![PyPI version](https://img.shields.io/pypi/v/errfriendly.svg)](https://pypi.org/project/errfriendly/)
-
-**errfriendly** transforms cryptic Python error messages into clear, actionable explanations. Version 3.0 introduces **AI-powered contextual analysis** and **exception chain visualization** for an intelligent debugging assistant experience.
-
----
-
-## ✨ What's New in v3.0
-
-- 🤖 **AI-Powered Explanations**: Get context-aware, personalized error explanations
-- 🔗 **Exception Chain Analysis**: Visualize and understand `__cause__` and `__context__` chains
-- 🏠 **Local-First AI**: Privacy-first with Ollama support (no data leaves your machine)
-- ☁️ **Cloud AI Fallback**: OpenAI, Anthropic, and Gemini support (opt-in)
-- 🎚️ **Explanation Depth**: Beginner, Intermediate, or Expert level explanations
-- 🔒 **Zero Breaking Changes**: Existing v2.x code works unchanged
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ---
 
-## ✨ Features
+## 🚀 Get Started in 30 Seconds
 
-- 🔍 **Clear Explanations**: Understand what went wrong in plain English
-- 💡 **Actionable Suggestions**: Get step-by-step guidance on how to fix common errors
-- 🤖 **AI Analysis**: Deep contextual understanding of your code (optional)
-- 🔗 **Chain Visualization**: Map exception causes into debugging stories
-- 🎨 **Colorful Output**: ANSI colors in terminal for better readability
-- 📝 **Logging Support**: Optionally log exceptions to a file
-- 🎯 **Zero Dependencies**: Core package requires no external packages
-- ⚡ **Easy Integration**: Just two lines of code to get started
-- 🔧 **Configurable**: Extensive customization options
-- 📦 **23+ Exception Types**: Covers all common Python exceptions
-
----
-
-## 📦 Installation
-
+### Install
 ```bash
-# Core package (zero dependencies)
 pip install errfriendly
-
-# With AI features
-pip install errfriendly[ai-local]    # Ollama support
-pip install errfriendly[ai-openai]   # OpenAI support
-pip install errfriendly[ai-all]      # All AI backends
 ```
 
-For development installation:
-
-```bash
-git clone https://github.com/infinawaz/errfriendly.git
-cd errfriendly
-pip install -e ".[dev]"
-```
-
----
-
-## 🚀 Quickstart
-
-### Basic Usage (v2.x Compatible)
-
+### Use
 ```python
 import errfriendly
-
-# Enable friendly error messages
 errfriendly.install()
 
-# That's it! Now all exceptions will show friendly explanations.
+# That's it! Now your errors look like this:
 ```
 
-### AI-Powered Explanations (v3.0)
+### Before vs After
 
-```python
-import errfriendly
-
-# Install the exception hook
-errfriendly.install()
-
-# Enable AI with local LLM (Ollama)
-errfriendly.enable_ai(
-    backend="local",
-    model="codellama",
-    explain_depth="intermediate"
-)
-
-# Or use OpenAI
-errfriendly.enable_ai(
-    backend="openai",
-    api_key="sk-...",  # Or set OPENAI_API_KEY env var
-    explain_depth="beginner"
-)
-```
-
-### Fine-Grained Configuration
-
-```python
-errfriendly.configure(
-    ai_threshold=0.7,           # Confidence threshold for caching
-    max_context_lines=15,       # Lines of code to analyze
-    include_variable_values=True,
-    privacy_mode="local_only",  # or "allow_cloud"
-    show_confidence=True,       # Show AI confidence scores
-    show_chain_analysis=True,   # Show exception chain maps
-)
-```
-
----
-
-## 📸 Before & After
-
-### Before (Standard Python)
-
+**❌ Before (confusing):**
 ```
 Traceback (most recent call last):
-  File "example.py", line 3, in <module>
-    result = data[0]
+  File "app.py", line 5, in <module>
+    print(data[0])
 TypeError: 'NoneType' object is not subscriptable
 ```
 
-😕 *"What does subscriptable even mean?"*
-
-### After (With errfriendly + AI)
-
+**✅ After (helpful):**
 ```
-Traceback (most recent call last):
-  File "example.py", line 3, in <module>
-    result = data[0]
-TypeError: 'NoneType' object is not subscriptable
-
 ======================================================================
-🤖 AI-POWERED EXPLANATION (Confidence: 92%)
+🔍 FRIENDLY ERROR EXPLANATION
 ======================================================================
 
-## 🤔 What Happened?
-You tried to access index `[0]` on the variable `data`, but `data` is `None`.
-Looking at your code, `data` was assigned `None` on line 2.
-
-## 🔍 Root Cause Analysis
-- Primary issue: Accessing an index on a None value
-- Contributing factors: Missing null check before indexing
-- Confidence: High
-
-## 🛠️ How to Fix
-
-### Option 1: Quick Fix (Immediate)
-```python
-if data is not None:
-    result = data[0]
-```
-
-### Option 2: Robust Solution (Recommended)
-```python
-result = data[0] if data else default_value
-```
-
-### Option 3: Prevent Future Occurrences
-```python
-def get_first_item(data: list | None) -> Any:
-    if not data:
-        raise ValueError("data cannot be empty or None")
-    return data[0]
-```
-
-======================================================================
-📝 Quick Reference (Static):
-======================================================================
 📛 TypeError: Trying to index None
-...
+
+💡 What happened:
+   You tried to use square brackets [] on a variable that is None.
+   This usually happens when a function returned None instead of a list/dict.
+
+🔧 How to fix it:
+   1. Check if your variable is None before accessing it: `if my_var is not None:`
+   2. Make sure the function you called actually returns something.
+   3. Print the variable before this line to see what it contains.
+
+======================================================================
 ```
 
 ---
 
-## 🔗 Exception Chain Analysis
+## 🤖 Want AI-Powered Explanations? (Optional)
 
-When exceptions are chained (using `raise ... from ...`), errfriendly visualizes the chain:
+Get even smarter, context-aware explanations using ChatGPT:
+
+### Step 1: Install with AI support
+```bash
+pip install errfriendly[ai-openai]
+```
+
+### Step 2: Set your API key
+```bash
+# Windows (PowerShell)
+$env:OPENAI_API_KEY = "sk-your-key-here"
+
+# Mac/Linux
+export OPENAI_API_KEY="sk-your-key-here"
+```
+
+### Step 3: Enable AI
+```python
+import errfriendly
+
+errfriendly.install()
+errfriendly.enable_ai(backend="openai")
+
+# Now errors include personalized AI explanations!
+```
+
+> **💡 Tip:** Don't have an OpenAI key? The basic `errfriendly.install()` works great without AI!
+
+---
+
+## 📚 All Supported Errors
+
+errfriendly explains **23+ common Python errors**, including:
+
+| Error | Example |
+|-------|---------|
+| `TypeError` | `None[0]`, `"hello" + 5` |
+| `KeyError` | `my_dict['missing_key']` |
+| `IndexError` | `my_list[100]` |
+| `ValueError` | `int("not a number")` |
+| `AttributeError` | `None.something()` |
+| `NameError` | Using undefined variables |
+| `FileNotFoundError` | Opening missing files |
+| `ZeroDivisionError` | `1 / 0` |
+| `ImportError` | Missing packages |
+| And 15+ more... | |
+
+---
+
+## ⚙️ Configuration Options
+
+```python
+import errfriendly
+
+# Basic install
+errfriendly.install()
+
+# Hide the original Python traceback (only show friendly message)
+errfriendly.install(show_original_traceback=False)
+
+# Log errors to a file
+errfriendly.install(log_file="errors.log")
+
+# Disable when done
+errfriendly.uninstall()
+
+# Check if installed
+print(errfriendly.is_installed())  # True or False
+```
+
+---
+
+## 🔗 Exception Chain Analysis (v3.0)
+
+When one error causes another, errfriendly shows you the full story:
 
 ```python
 try:
-    user = db.get_user(user_id)  # KeyError
-except KeyError as e:
-    raise ValueError("User not found") from e
+    data = get_user(user_id)  # Returns None
+except TypeError:
+    raise ValueError("User lookup failed")  # Chained exception
 ```
 
-**Output:**
-
+Output:
 ```
-======================================================================
 🔗 EXCEPTION CHAIN ANALYSIS
 ======================================================================
 
 🕵️ Exception Investigation Map:
 
-[Primary Error] ValueError: User not found
-    ↳ Caused by: [KeyError] 'user_id'
+[Primary Error] ValueError: User lookup failed
+    ↳ Caused by: [TypeError] 'NoneType' object is not subscriptable
 
 📖 Story:
-(1) First, a KeyError occurred: "'user_id'" → 
-(2) which caused a ValueError: "User not found"
+(1) First, a TypeError occurred → (2) which caused a ValueError
 
 🔧 Fix Strategy:
-Focus on the underlying KeyError: "'user_id'". 
-The ValueError is just a wrapper.
+Focus on the underlying TypeError first. The ValueError is just a wrapper.
 ```
 
 ---
 
-## 🎛️ Configuration Options
+## 🌐 AI Backend Options
 
-### AI Backend Options
-
-| Backend | Description | Requirements |
-|---------|-------------|--------------|
-| `local` / `ollama` | Local LLM via Ollama | Ollama running locally |
-| `openai` | OpenAI API | `OPENAI_API_KEY` env var |
-| `anthropic` | Anthropic Claude | `ANTHROPIC_API_KEY` env var |
-| `gemini` | Google Gemini | `GOOGLE_API_KEY` env var |
-
-### Explanation Depth
-
-| Level | Description |
-|-------|-------------|
-| `beginner` | ELI5 style, simple language, explains jargon |
-| `intermediate` | Standard developer explanations (default) |
-| `expert` | Deep technical details, CPython internals |
-
-### All Configuration Options
+| Backend | Command | Best For |
+|---------|---------|----------|
+| **OpenAI** | `pip install errfriendly[ai-openai]` | Best quality |
+| **Anthropic** | `pip install errfriendly[ai-anthropic]` | Claude fans |
+| **Gemini** | `pip install errfriendly[ai-gemini]` | Free tier available |
+| **Ollama** | `pip install errfriendly[ai-local]` | Privacy (runs locally) |
 
 ```python
-errfriendly.configure(
-    # AI Settings
-    ai_threshold=0.7,           # Cache confidence threshold (0.0-1.0)
-    ai_timeout=10.0,            # AI request timeout (seconds)
-    max_requests_per_minute=10, # Rate limiting
-    
-    # Context Collection
-    max_context_lines=15,       # Lines of code to include
-    include_variable_values=True,
-    collect_git_changes=False,  # Include git diff
-    
-    # Privacy & Safety
-    privacy_mode="local_only",  # "local_only" or "allow_cloud"
-    
-    # Output
-    explanation_style="bullet_points",  # or "narrative", "stepwise"
-    show_confidence=True,
-    show_chain_analysis=True,
+# Choose your backend
+errfriendly.enable_ai(backend="openai")      # ChatGPT
+errfriendly.enable_ai(backend="anthropic")   # Claude
+errfriendly.enable_ai(backend="gemini")      # Google Gemini
+errfriendly.enable_ai(backend="local")       # Ollama (local)
+```
+
+---
+
+## ❓ FAQ
+
+### Do I need an API key?
+**No!** The basic `errfriendly.install()` works without any API key. AI is optional.
+
+### Will this slow down my code?
+**No.** errfriendly only runs when an error actually happens.
+
+### Can I use this in production?
+It's designed for **development and learning**. For production, use proper logging.
+
+### Does it work in Jupyter notebooks?
+**Yes!** Just add `errfriendly.install()` at the top of your notebook.
+
+---
+
+## 📦 Quick Reference
+
+```python
+import errfriendly
+
+# Basic (no API key needed)
+errfriendly.install()
+
+# With AI (needs OPENAI_API_KEY)
+errfriendly.enable_ai(backend="openai")
+
+# Customize AI
+errfriendly.enable_ai(
+    backend="openai",
+    model="gpt-4o-mini",           # Which model to use
+    explain_depth="beginner"       # beginner, intermediate, or expert
 )
-```
 
----
+# Fine-tune settings
+errfriendly.configure(
+    show_chain_analysis=True,      # Show exception chains
+    show_confidence=True,          # Show AI confidence score
+)
 
-## 📋 Supported Exception Types
-
-errfriendly provides friendly explanations for:
-
-| Exception | Common Causes |
-|-----------|--------------|
-| `TypeError` | Wrong type operations, None subscripting, not callable |
-| `ValueError` | Invalid conversions, unpacking issues |
-| `IndexError` | List/tuple/string index out of range |
-| `KeyError` | Missing dictionary keys |
-| `AttributeError` | Accessing non-existent attributes |
-| `NameError` | Undefined variables |
-| `ImportError` | Failed imports |
-| `ModuleNotFoundError` | Missing modules |
-| `ZeroDivisionError` | Division by zero |
-| `FileNotFoundError` | Missing files |
-| `PermissionError` | Access denied |
-| `RecursionError` | Infinite recursion |
-| `SyntaxError` | Invalid syntax |
-| `UnicodeDecodeError` | Encoding issues |
-| `UnicodeEncodeError` | Encoding issues |
-| `OverflowError` | Number too large |
-| `MemoryError` | Out of memory |
-| `StopIteration` | Iterator exhausted |
-| `AssertionError` | Failed assertions |
-| `NotImplementedError` | Unimplemented features |
-| `KeyboardInterrupt` | User interruption (Ctrl+C) |
-| `TimeoutError` | Operation timeouts |
-| `ConnectionError` | Network connection failures |
-
-Plus a **fallback handler** for any other exception types!
-
----
-
-## 🛠️ Advanced Usage
-
-### Programmatic Access
-
-```python
-from errfriendly import get_friendly_message
-from errfriendly.context_collector import ContextCollector
-from errfriendly.exception_graph import ExceptionChainAnalyzer
-
-# Get a friendly message directly
-message = get_friendly_message(TypeError, TypeError("'int' object is not callable"))
-print(message)
-
-# Analyze exception context
-collector = ContextCollector()
-try:
-    1 / 0
-except:
-    import sys
-    context = collector.collect(*sys.exc_info())
-    print(f"Detected patterns: {context.detected_patterns}")
-
-# Analyze exception chains
-analyzer = ExceptionChainAnalyzer()
-try:
-    try:
-        raise KeyError("original")
-    except KeyError as e:
-        raise ValueError("wrapper") from e
-except:
-    chain = analyzer.analyze(*sys.exc_info())
-    print(analyzer.generate_narrative(chain))
-```
-
-### Integration with Logging
-
-```python
-import errfriendly
-import logging
-
-# Install with file logging
-errfriendly.install(log_file="errors.log")
-```
-
-### In Jupyter Notebooks
-
-```python
-# Works in Jupyter too!
-import errfriendly
-errfriendly.install()
-errfriendly.enable_ai(backend="local")
-
-# Exceptions in cells will show AI-powered explanations
-```
-
----
-
-## 🧪 Running Tests
-
-```bash
-# Install development dependencies
-pip install -e ".[dev]"
-
-# Run tests
-pytest
-
-# Run tests with coverage
-pytest --cov=errfriendly --cov-report=html
-```
-
----
-
-## 🎯 Scope & Limitations
-
-### What errfriendly Explains
-
-errfriendly explains **unhandled exceptions** that propagate to Python's `sys.excepthook`. These are exceptions that would normally crash your program.
-
-```python
-# ✅ errfriendly WILL explain this (unhandled exception)
-import errfriendly
-errfriendly.install()
-
-def main():
-    data = None
-    print(data[0])  # TypeError propagates → errfriendly explains it
-
-main()
-```
-
-### What errfriendly Cannot See
-
-**Caught exceptions are invisible by design.** This is Python's behavior, not a limitation:
-
-```python
-# ❌ errfriendly will NOT see this (exception is caught)
-try:
-    1 / 0
-except:
-    pass  # Exception swallowed - invisible to sys.excepthook
-```
-
-> [!NOTE]
-> This is intentional. If you catch an exception, you've decided to handle it yourself.
-> errfriendly respects that decision and doesn't interfere.
-
-### When NOT to Use errfriendly
-
-- **Production servers**: Use proper logging and monitoring instead
-- **Libraries**: Don't install a global excepthook in library code
-- **Caught exceptions**: errfriendly can't explain exceptions you handle yourself
-
-### Opt-in Extensions for Caught Exceptions
-
-If you want friendly explanations for caught exceptions, you can use the API directly:
-
-```python
-from errfriendly import get_friendly_message
-
-try:
-    int("not a number")
-except ValueError as e:
-    # Get a friendly explanation without raising
-    msg = get_friendly_message(type(e), e)
-    print(msg)
-    # Now handle the error yourself
-```
-
-For AI explanations of caught exceptions:
-
-```python
-from errfriendly.context_collector import ContextCollector
-from errfriendly.ai_explainer import AIExplainer
-from errfriendly import Config
-import sys
-
-try:
-    risky_operation()
-except Exception as e:
-    # Manually collect context and get AI explanation
-    config = Config(ai_enabled=True)
-    collector = ContextCollector(config)
-    context = collector.collect(type(e), e, e.__traceback__)
-    
-    explainer = AIExplainer(config)
-    explanation = explainer.explain(context)
-    if explanation:
-        print(explanation.format_markdown())
-```
-
-### Debug Mode
-
-To see internal errors in errfriendly's AI/chain features (for library development):
-
-```python
-errfriendly.configure(debug_mode=True)
-```
-
----
-
-## 🗺️ Roadmap
-
-### v3.0.0 ✅ (Current)
-- [x] AI-powered contextual explanations
-- [x] Exception chain analysis and visualization
-- [x] Multiple AI backends (Ollama, OpenAI, Anthropic, Gemini)
-- [x] Explanation depth levels
-- [x] Privacy-first design
-
-### v3.1.0 (Planned)
-- [ ] IDE integrations (VS Code extension)
-- [ ] Custom prompt templates
-- [ ] Framework-specific patterns (Django, FastAPI, etc.)
-- [ ] Async/await chain analysis
-
-### v4.0.0 (Goal)
-- [ ] Interactive debugging assistant
-- [ ] Code fix suggestions with auto-apply
-- [ ] Learning from user feedback
-- [ ] Multi-language support
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Here's how you can help:
-
-1. **Report bugs**: Open an issue describing the problem
-2. **Suggest features**: Open an issue with your idea
-3. **Submit PRs**: Fork, make changes, and submit a pull request
-
-### Development Setup
-
-```bash
-git clone https://github.com/infinawaz/errfriendly.git
-cd errfriendly
-pip install -e ".[dev,ai-all]"
-pytest
+# Disable
+errfriendly.disable_ai()           # Turn off AI
+errfriendly.uninstall()            # Remove completely
 ```
 
 ---
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-## 💖 Acknowledgments
-
-- Inspired by the Python community's focus on developer experience
-- Thanks to all contributors who help make error messages friendlier
+MIT License - Use it however you want!
 
 ---
 
 <p align="center">
-  Made with ❤️ for Python developers everywhere
+  Made with ❤️ to help Python beginners understand errors
 </p>
