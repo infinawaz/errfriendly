@@ -10,9 +10,9 @@
 
 ## 🚀 Get Started in 30 Seconds
 
-### Install
+### Install / Upgrade
 ```bash
-pip install errfriendly
+pip install --upgrade errfriendly
 ```
 
 ### Uninstall
@@ -242,6 +242,25 @@ KeyError: Key 'timeout' not found
 KeyError: 'adress' not found
 👉 Did you mean **'address'**? (Found in locals)
 ```
+
+---
+
+## 📜 Release History
+
+### v3.4 (Latest) - The "Politeness" Update
+- **Friendly Warnings:** Intercepts `DeprecationWarning` and `SyntaxWarning` to show helpful advice boxes.
+- **Metadata Fixes:** Corrected author info and added uninstall guide.
+
+### v3.3 - The "Smart Diagnostic" Update
+- **Homoglyph Detection:** Finds "invisible" typos (e.g., Cyrillic 'o' vs Latin 'o') in `KeyError`.
+- **Typo Suggestions:** Suggests close matches from local variables.
+
+### v3.2 - The "Audit" Update
+- **Runtime Audit:** Proactive `json.dumps` monitoring to prevent silent data corruption (`default=str`).
+
+### v3.0 - The "Intelligence" Rewrite
+- **AI-Powered Explanations:** Integration with DeepSeek, OpenAI, etc.
+- **Exception Chain Analysis:** Visualizes the root cause of chained errors.
 
 ---
 
