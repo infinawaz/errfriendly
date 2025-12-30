@@ -8,7 +8,7 @@ that analyzes the error message and provides contextual advice.
 
 import re
 import sys
-from typing import Type, Optional
+from typing import Type, Optional, List
 
 
 # ANSI color codes for terminal output
@@ -77,7 +77,7 @@ def get_friendly_message(exc_type: Type[BaseException], exc_value: BaseException
     return handler(exc_type, exc_value, error_message)
 
 
-def _format_message(title: str, explanation: str, suggestions: list[str]) -> str:
+def _format_message(title: str, explanation: str, suggestions: List[str]) -> str:
     """
     Format a friendly error message with consistent styling.
     

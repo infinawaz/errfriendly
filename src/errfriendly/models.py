@@ -223,6 +223,10 @@ class Config:
     show_confidence: bool = True
     show_chain_analysis: bool = True
     
+    # Debug & Internals
+    debug_mode: bool = False  # If True, log internal errors to stderr
+    max_cache_size: int = 100  # Maximum cached AI explanations
+    
     # Rate Limiting
     max_requests_per_minute: int = 10
     

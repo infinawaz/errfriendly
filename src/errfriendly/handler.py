@@ -12,7 +12,6 @@ import sys
 import traceback
 import logging
 from typing import Type, Optional, Union, Dict, Any
-from pathlib import Path
 
 from .messages import get_friendly_message
 from .models import (
@@ -155,8 +154,9 @@ def _generate_chain_analysis(
             output += "=" * 70 + "\n\n"
             output += analyzer.generate_narrative(chain)
             return output
-    except Exception:
-        pass
+    except Exception as e:
+        if _config.debug_mode:
+            print(f"[errfriendly] Chain analysis failed: {e}", file=sys.stderr)
     
     return None
 
@@ -182,8 +182,9 @@ def _generate_ai_explanation(
             output += "\n" + "=" * 70 + "\n\n"
             output += explanation.format_markdown()
             return output
-    except Exception:
-        pass
+    except Exception as e:
+        if _config.debug_mode:
+            print(f"[errfriendly] AI explanation failed: {e}", file=sys.stderr)
     
     return None
 

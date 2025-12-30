@@ -421,6 +421,10 @@ class AIExplainer:
             
             # Cache if high confidence
             if explanation and explanation.confidence >= self.config.ai_threshold:
+                # Evict oldest entry if cache is full
+                if len(self._cache) >= self.config.max_cache_size:
+                    oldest_key = next(iter(self._cache))
+                    del self._cache[oldest_key]
                 self._cache[cache_key] = explanation
             
             return explanation
@@ -461,7 +465,7 @@ class AIExplainer:
         """
         # Key on error type and message pattern, not exact message
         key_data = f"{context.exception_type}:{context.error_message[:100]}"
-        return hashlib.md5(key_data.encode()).hexdigest()
+        return hashlib.sha256(key_data.encode()).hexdigest()[:16]
     
     def _build_system_prompt(self) -> str:
         """Build the system prompt with depth instruction.
