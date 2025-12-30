@@ -101,7 +101,7 @@ def _friendly_excepthook(
                 output_parts.append(ai_output)
         
         # Always include static friendly message as fallback/complement
-        friendly_message = get_friendly_message(exc_type, exc_value)
+        friendly_message = get_friendly_message(exc_type, exc_value, tb=exc_traceback)
         
         # If we have AI/chain output, combine them appropriately
         if output_parts:

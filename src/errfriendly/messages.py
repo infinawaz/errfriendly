@@ -8,7 +8,9 @@ that analyzes the error message and provides contextual advice.
 
 import re
 import sys
-from typing import Type, Optional, List
+import difflib
+from typing import Type, Optional, List, Any, Dict, Tuple
+from collections.abc import MutableMapping
 
 
 # ANSI color codes for terminal output
@@ -31,13 +33,18 @@ def _use_colors() -> bool:
         return False
 
 
-def get_friendly_message(exc_type: Type[BaseException], exc_value: BaseException) -> str:
+def get_friendly_message(
+    exc_type: Type[BaseException], 
+    exc_value: BaseException, 
+    tb: Optional["types.TracebackType"] = None
+) -> str:
     """
     Get a friendly, human-readable explanation for an exception.
     
     Args:
         exc_type: The type of the exception (e.g., TypeError, ValueError).
         exc_value: The exception instance containing the error message.
+        tb: Optional traceback object for context inspection.
     
     Returns:
         A string containing a friendly explanation of the error and suggestions
@@ -74,6 +81,12 @@ def get_friendly_message(exc_type: Type[BaseException], exc_value: BaseException
     }
     
     handler = handlers.get(exc_name, _explain_generic_error)
+    
+    # Check if handler accepts traceback (inspect signature)
+    import inspect
+    sig = inspect.signature(handler)
+    if "tb" in sig.parameters:
+        return handler(exc_type, exc_value, error_message, tb=tb)
     return handler(exc_type, exc_value, error_message)
 
 
@@ -311,23 +324,73 @@ def _explain_index_error(exc_type: Type[BaseException], exc_value: BaseException
     )
 
 
-def _explain_key_error(exc_type: Type[BaseException], exc_value: BaseException, error_message: str) -> str:
-    """Handle KeyError exceptions."""
+def _explain_key_error(
+    exc_type: Type[BaseException], 
+    exc_value: BaseException, 
+    error_message: str,
+    tb: Optional[Any] = None
+) -> str:
+    """Handle KeyError exceptions with smart diagnostics."""
     
     # Extract the key that caused the error
     key_repr = error_message if error_message else "unknown"
+    # key_repr is usually "'key_name'" (quoted)
+    raw_key = key_repr.strip("'\"")
+    
+    suggestions = [
+        "Use `.get(key, default)` to provide a default value: `my_dict.get('key', 'default')`",
+        "Check if the key exists first: `if 'key' in my_dict:`",
+        "Print all available keys: `print(my_dict.keys())`",
+    ]
+    
+    # Smart Diagnostic: Check for typos and homoglyphs in local variables
+    if tb:
+        try:
+            # Get locals from the frame where exception occurred
+            frame = tb.tb_frame
+            locals_dict = frame.f_locals
+            
+            # Find candidate dictionaries (variables that are dicts)
+            candidates = []
+            for name, val in locals_dict.items():
+                if isinstance(val, (dict, MutableMapping)) and len(val) > 0:
+                    candidates.extend(val.keys())
+            
+            # Use string representation of keys for comparison
+            str_candidates = [str(k) for k in candidates]
+            
+            # 1. Check for close matches (Levenshtein distance)
+            matches = difflib.get_close_matches(raw_key, str_candidates, n=3, cutoff=0.7)
+            
+            for match in matches:
+                # 2. Check for Homoglyphs (Look-alikes)
+                # If they are visually similar but not equal
+                if match != raw_key:
+                    suggestions.insert(0, f"👉 Did you mean **'{match}'**? (Found in locals)")
+                    
+                    # Specific check for invisible/confusable characters (e.g. Cyrillic 'o' vs Latin 'o')
+                    # Simple heuristic: if length is same but characters differ
+                    if len(match) == len(raw_key) and match != raw_key:
+                        diff_chars = [
+                            (ord(c1), ord(c2)) 
+                            for c1, c2 in zip(raw_key, match) 
+                            if c1 != c2
+                        ]
+                        if diff_chars:
+                            suggestions.insert(0, "⚠️ **WARNING:** Possible hidden character confusion detected (e.g. Cyrillic vs Latin).")
+                            
+        except Exception:
+            # Don't let smart diagnostics crash the error handler
+            pass
+
+    suggestions.append("Check for typos in the key name.")
+    suggestions.append("Use `.setdefault(key, value)` if you want to add the key if missing.")
     
     return _format_message(
         f"KeyError: Key {key_repr} not found",
         f"You tried to access a dictionary key that doesn't exist. "
         f"The key {key_repr} is not present in the dictionary.",
-        [
-            "Use `.get(key, default)` to provide a default value: `my_dict.get('key', 'default')`",
-            "Check if the key exists first: `if 'key' in my_dict:`",
-            "Print all available keys: `print(my_dict.keys())`",
-            "Check for typos in the key name.",
-            "Use `.setdefault(key, value)` if you want to add the key if missing."
-        ]
+        suggestions
     )
 
 

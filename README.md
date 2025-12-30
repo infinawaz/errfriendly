@@ -215,6 +215,31 @@ json.dumps({"time": datetime.now()}, default=str)
 
 ---
 
+## 🔬 Smart Diagnostics (v3.3)
+
+errfriendly now performs deep analysis of your local variables to find the *real* cause of errors.
+
+**Example 1: The Invisible Character Bug**
+```python
+config = {"timeоut": 60}  # Cyrillic 'o'
+print(config["timeout"])  # Latin 'o' -> KeyError
+```
+**Output:**
+```
+KeyError: Key 'timeout' not found
+👉 Did you mean **'timeоut'**? (Found in locals)
+⚠️ **WARNING:** Possible hidden character confusion detected (e.g. Cyrillic vs Latin).
+```
+
+**Example 2: Typos**
+```python
+# You typed 'adress', but 'address' exists
+KeyError: 'adress' not found
+👉 Did you mean **'address'**? (Found in locals)
+```
+
+---
+
 ## ❓ FAQ
 
 ### Do I need an API key?
