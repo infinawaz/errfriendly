@@ -8,14 +8,15 @@ v3.0 adds AI-powered contextual explanations and exception chain analysis.
 """
 
 from .handler import (
-    install, 
-    uninstall, 
+    install,
+    uninstall,
     is_installed,
     enable_ai,
     disable_ai,
     configure,
     get_config,
 )
+from .audit import enable_audit, disable_audit
 from .messages import get_friendly_message
 from .models import (
     Config,
@@ -28,7 +29,7 @@ from .models import (
     AIExplanation,
 )
 
-__version__ = "3.1.0"
+__version__ = "3.2.0"
 __all__ = [
     # Core functions (backward compatible)
     "install",
@@ -40,6 +41,11 @@ __all__ = [
     "disable_ai",
     "configure",
     "get_config",
+    
+    # Audit (v3.1)
+    "enable_audit",
+    "disable_audit",
+    
     # v3.0: Data types
     "Config",
     "AIBackend",

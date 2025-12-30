@@ -183,6 +183,38 @@ errfriendly.enable_ai(backend="local")         # Ollama (local)
 
 ---
 
+## 🛡️ Proactive Runtime Audit (v3.1)
+
+errfriendly can now detect "silent failures"—bugs that corrupt data without crashing (like usage of `default=str` in JSON).
+
+```python
+# Enable proactive auditing
+errfriendly.enable_audit()
+
+# Now it watches for dangerous patterns:
+import json
+from datetime import datetime
+
+# ⚠️ This would normally fail silently (destroying the datetime object)
+# With audit enabled, errfriendly warns you immediately!
+json.dumps({"time": datetime.now()}, default=str)
+```
+
+**Output:**
+```
+⚠️ AUDIT WARNING: Dangerous JSON Serialization Detected
+
+💡 The 'Silent Destroyer':
+   You are using json.dumps(..., default=str).
+   This converts complex objects (like datetime) into dumb strings,
+   destroying type information without raising an error.
+
+🔧 Fix:
+   Use a custom encoder subclass or explicit conversion.
+```
+
+---
+
 ## ❓ FAQ
 
 ### Do I need an API key?
