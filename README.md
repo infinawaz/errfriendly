@@ -358,6 +358,94 @@ pytest --cov=errfriendly --cov-report=html
 
 ---
 
+## 🎯 Scope & Limitations
+
+### What errfriendly Explains
+
+errfriendly explains **unhandled exceptions** that propagate to Python's `sys.excepthook`. These are exceptions that would normally crash your program.
+
+```python
+# ✅ errfriendly WILL explain this (unhandled exception)
+import errfriendly
+errfriendly.install()
+
+def main():
+    data = None
+    print(data[0])  # TypeError propagates → errfriendly explains it
+
+main()
+```
+
+### What errfriendly Cannot See
+
+**Caught exceptions are invisible by design.** This is Python's behavior, not a limitation:
+
+```python
+# ❌ errfriendly will NOT see this (exception is caught)
+try:
+    1 / 0
+except:
+    pass  # Exception swallowed - invisible to sys.excepthook
+```
+
+> [!NOTE]
+> This is intentional. If you catch an exception, you've decided to handle it yourself.
+> errfriendly respects that decision and doesn't interfere.
+
+### When NOT to Use errfriendly
+
+- **Production servers**: Use proper logging and monitoring instead
+- **Libraries**: Don't install a global excepthook in library code
+- **Caught exceptions**: errfriendly can't explain exceptions you handle yourself
+
+### Opt-in Extensions for Caught Exceptions
+
+If you want friendly explanations for caught exceptions, you can use the API directly:
+
+```python
+from errfriendly import get_friendly_message
+
+try:
+    int("not a number")
+except ValueError as e:
+    # Get a friendly explanation without raising
+    msg = get_friendly_message(type(e), e)
+    print(msg)
+    # Now handle the error yourself
+```
+
+For AI explanations of caught exceptions:
+
+```python
+from errfriendly.context_collector import ContextCollector
+from errfriendly.ai_explainer import AIExplainer
+from errfriendly import Config
+import sys
+
+try:
+    risky_operation()
+except Exception as e:
+    # Manually collect context and get AI explanation
+    config = Config(ai_enabled=True)
+    collector = ContextCollector(config)
+    context = collector.collect(type(e), e, e.__traceback__)
+    
+    explainer = AIExplainer(config)
+    explanation = explainer.explain(context)
+    if explanation:
+        print(explanation.format_markdown())
+```
+
+### Debug Mode
+
+To see internal errors in errfriendly's AI/chain features (for library development):
+
+```python
+errfriendly.configure(debug_mode=True)
+```
+
+---
+
 ## 🗺️ Roadmap
 
 ### v3.0.0 ✅ (Current)

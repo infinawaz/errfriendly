@@ -143,7 +143,21 @@ def _generate_chain_analysis(
     exc_value: BaseException,
     exc_traceback
 ) -> Optional[str]:
-    """Generate exception chain analysis output."""
+    """Generate exception chain analysis output.
+    
+    This function analyzes __cause__ and __context__ chains to provide
+    a debugging narrative for chained exceptions.
+    
+    Design Note:
+        Internal exceptions are caught and suppressed by design (graceful
+        degradation). If chain analysis fails, the core friendly message
+        still displays. Use `errfriendly.configure(debug_mode=True)` to
+        see internal errors for library development/debugging.
+    
+    Returns:
+        Formatted chain analysis string, or None if chain analysis fails
+        or the exception has no chain.
+    """
     try:
         analyzer = _get_chain_analyzer()
         chain = analyzer.analyze(exc_type, exc_value, exc_traceback)
@@ -155,6 +169,7 @@ def _generate_chain_analysis(
             output += analyzer.generate_narrative(chain)
             return output
     except Exception as e:
+        # Intentional graceful degradation - see Design Note in docstring
         if _config.debug_mode:
             print(f"[errfriendly] Chain analysis failed: {e}", file=sys.stderr)
     
@@ -166,7 +181,22 @@ def _generate_ai_explanation(
     exc_value: BaseException,
     exc_traceback
 ) -> Optional[str]:
-    """Generate AI-powered explanation output."""
+    """Generate AI-powered explanation output.
+    
+    This function uses an AI backend (local or cloud) to provide
+    contextual, personalized error explanations.
+    
+    Design Note:
+        Internal exceptions are caught and suppressed by design (graceful
+        degradation). AI failures (network timeouts, missing Ollama, rate
+        limits, etc.) should not prevent the core friendly message from
+        displaying. Use `errfriendly.configure(debug_mode=True)` to see
+        internal errors for library development/debugging.
+    
+    Returns:
+        Formatted AI explanation string, or None if AI is disabled,
+        unavailable, or fails.
+    """
     try:
         collector = _get_context_collector()
         context = collector.collect(exc_type, exc_value, exc_traceback)
@@ -183,6 +213,7 @@ def _generate_ai_explanation(
             output += explanation.format_markdown()
             return output
     except Exception as e:
+        # Intentional graceful degradation - see Design Note in docstring
         if _config.debug_mode:
             print(f"[errfriendly] AI explanation failed: {e}", file=sys.stderr)
     
