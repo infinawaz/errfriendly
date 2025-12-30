@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "errfriendly"
-version = "0.2.0"
+version = "3.0.0"
 description = "Friendly explanations for Python errors"
 readme = "README.md"
 license = {text = "MIT"}
@@ -12,7 +12,7 @@ requires-python = ">=3.8"
 authors = [
     {name = "Shahnawaz", email = "your.email@example.com"}
 ]
-keywords = ["exceptions", "debugging", "developer-tools", "error-messages", "traceback"]
+keywords = ["exceptions", "debugging", "developer-tools", "error-messages", "traceback", "ai", "llm", "ollama", "openai"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
@@ -40,6 +40,25 @@ dev = [
     "pytest>=7.0.0",
     "pytest-cov>=4.0.0",
     "build>=1.0.0",
+]
+# AI feature optional dependencies
+ai-local = [
+    "httpx>=0.24.0",
+]
+ai-openai = [
+    "openai>=1.0.0",
+]
+ai-anthropic = [
+    "anthropic>=0.18.0",
+]
+ai-gemini = [
+    "google-generativeai>=0.4.0",
+]
+ai-all = [
+    "httpx>=0.24.0",
+    "openai>=1.0.0",
+    "anthropic>=0.18.0",
+    "google-generativeai>=0.4.0",
 ]
 
 [tool.setuptools]
